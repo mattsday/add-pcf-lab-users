@@ -10,6 +10,10 @@ OPSMAN_URI="https://opsman.domain.xyz"
 OPSMAN_ADMIN_USER="admin"
 OPSMAN_ADMIN_PASS="password"
 
+ENABLE_PKS=true
+ENABLE_PAS=true
+ENABLE_OPSMAN=true
+
 # Optional but speeds things up
 
 # PKS API endpoint
