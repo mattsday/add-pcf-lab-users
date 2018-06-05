@@ -17,7 +17,7 @@ ENABLE_OPSMAN=true
 # Optional but speeds things up
 
 # PKS API endpoint
-# PKS_UAA="api.pks.domain.xyz"
+# PKS_API="api.pks.domain.xyz"
 
 # PAS System domain
 # PAS_SYS="sys.domain.xyz"

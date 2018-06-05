@@ -28,6 +28,12 @@ fi
 
 OPSMAN_UAA="${OPSMAN_URI}/uaa"
 
+echo Attempting opsman login
+if ! om -k -u "${OPSMAN_ADMIN_USER}" -p "${OPSMAN_ADMIN_PASS}" -t "${OPSMAN_URI}" installations >/dev/null 2>&1; then
+	echo Failed to authenticate to ops manager
+	exit 1
+fi
+
 if [ "${ENABLE_PAS}" = true ]; then
 	# Configure PAS:
 	if [ -z "${PAS_SYS}" ]; then
@@ -51,8 +57,8 @@ fi
 
 if [ "${ENABLE_PKS}" = true ]; then
 	# Configure PKS:
-	if [ ! -z "${PKS_UAA}" ]; then
-		PKS_API="https://${PKS_UAA}:8443/"
+	if [ ! -z "${PKS_API}" ]; then
+		PKS_UAA="https://${PKS_API}:8443/"
 	elif [ -z "${PKS_UAA}" ] || [ -z "${PKS_API}" ]; then
 		echo "Getting PKS config (this can take up to 60 seconds)"
 		echo "You can set PKS_API to speed this up (e.g. PKS_API=api.pks.cf.domain)"
@@ -86,7 +92,7 @@ fi
 
 if [ "${ENABLE_PKS}" = true ]; then
 	if ! uaac target "${PKS_UAA}"; then
-		echo "Failed to connect to PCF"
+		echo "Failed to connect to PKS UAA"
 		exit 1
 	fi
 	if ! uaac token client get "${PKS_ADMIN_NAME}" -s "${PKS_ADMIN_PASS}"; then
