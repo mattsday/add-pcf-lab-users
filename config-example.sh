@@ -14,6 +14,9 @@ ENABLE_PKS=true
 ENABLE_PAS=true
 ENABLE_OPSMAN=true
 
+# If you're setting true here go check out letsencrypt!
+SKIP_SSL_VALIDATION=false
+
 # Optional but speeds things up
 
 # PKS API endpoint

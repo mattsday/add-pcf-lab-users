@@ -27,6 +27,12 @@ fi
 . config.sh
 
 OPSMAN_UAA="${OPSMAN_URI}/uaa"
+CF_COMMAND_FLAGS=""
+
+if [ "${SKIP_SSL_VALIDATION}" = true ]; then
+	echo Warning, skipping SSL validation
+	CF_COMMAND_FLAGS="--skip-ssl-validation"
+fi
 
 echo Attempting opsman login
 if ! om -k -u "${OPSMAN_ADMIN_USER}" -p "${OPSMAN_ADMIN_PASS}" -t "${OPSMAN_URI}" installations >/dev/null 2>&1; then
@@ -76,11 +82,11 @@ if [ "${ENABLE_PKS}" = true ]; then
 fi
 # Attempt logins
 if [ "${ENABLE_PAS}" = true ]; then
-	if ! cf login -u "${PAS_ADMIN_NAME}" -p "${PAS_ADMIN_PASS}" -a "${PAS_API}" -o system -s system; then
+	if ! cf login "${CF_COMMAND_FLAGS}" -u "${PAS_ADMIN_NAME}" -p "${PAS_ADMIN_PASS}" -a "${PAS_API}" -o system -s system; then
 		Failed to connect to PCF
 		exit 1
 	fi
-	if ! uaac target "${PAS_UAA}"; then
+	if ! uaac target "${CF_COMMAND_FLAGS}" "${PAS_UAA}"; then
 		Failed to connect to PAS UAA
 		exit 1
 	fi
@@ -91,7 +97,7 @@ if [ "${ENABLE_PAS}" = true ]; then
 fi
 
 if [ "${ENABLE_PKS}" = true ]; then
-	if ! uaac target "${PKS_UAA}"; then
+	if ! uaac target "${CF_COMMAND_FLAGS}" "${PKS_UAA}"; then
 		echo "Failed to connect to PKS UAA"
 		exit 1
 	fi
@@ -101,7 +107,7 @@ if [ "${ENABLE_PKS}" = true ]; then
 	fi
 fi
 if [ "${ENABLE_OPSMAN}" = true ]; then
-	if ! uaac target "${OPSMAN_UAA}"; then
+	if ! uaac target "${CF_COMMAND_FLAGS}" "${OPSMAN_UAA}"; then
 		echo "Failed to connect to opsman UAA"
 		exit 1
 	fi
@@ -125,8 +131,12 @@ for EMAIL in ${EMAIL_LIST}; do
 	echo Username: "${NAME}"
 	echo Password: "${PW}"
 	echo CLI Commands:
-	echo cf login -u "${NAME}" -p "${PW}" -a "${PAS_API}" -o "${NAME}" -s "${NAME}"
-	echo pks login -u "${NAME}" -p "${PW}" -a "${PKS_API}" -k
+	if [ "${ENABLE_PAS}" = true ]; then
+		echo cf login "${CF_COMMAND_FLAGS}" -u "${NAME}" -p "${PW}" -a "${PAS_API}" -o "${NAME}" -s "${NAME}"
+	fi
+	if [ "${ENABLE_PKS}" = true ]; then
+		echo pks login -u "${NAME}" -p "${PW}" -a "${PKS_API}" -k
+	fi
 	echo ====================
 	{
 	if [ "${ENABLE_PKS}" = true ]; then
